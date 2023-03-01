@@ -11,9 +11,9 @@ public_users.post("/register", (req,res) => {
   //return res.status(300).json({message: "Yet to be implemented"});
 });
 
-public_users.get("/login_auth", (req,res) => {
-    res.send(users);
-});
+//public_users.get("/getlogins", (req,res) => {
+//    res.send(users);
+//});
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {

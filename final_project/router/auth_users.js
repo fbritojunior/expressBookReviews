@@ -13,35 +13,58 @@ const isValid = (username)=>{ //returns boolean
 const authenticatedUser = (username,password)=>{ //returns boolean
 //write code to check if username and password match the one we have in records.
     for (user of users) {
-        if (username === user.username && password === user.password) {
-            return True;
+        if (username == user.username & password == user.password) {
+            return true;
         }
         else {
-            return False
+            return false
         }
     }
 }
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
-    const user = req.body.username;
-    const pwd = req.body.password;
-    isValid(user);
+    //const user = req.body.username;
+    //const pwd = req.body.password;
+    //isValid(user);
 
-    if (!user) {
-        return res.status(404).json({message: "Body Empty"});
-    }
-    let accessToken = jwt.sign({
-        data: user
-      }, 'access', { expiresIn: 60 });
+    //if (!user) {
+    //    return res.status(404).json({message: "Body Empty"});
+    //}
+    //let accessToken = jwt.sign({
+      //  data: user
+      //}, 'access', { expiresIn: 60 });
 
-      req.session.authorization = {
-        accessToken
+      //req.session.authorization = {
+        //accessToken
+    //}
+    //authenticatedUser(user,pwd);
+    //return res.status(200).send("User successfully logged in");
+
+
+    const username = req.body.username;
+    const password = req.body.password;
+
+    if (!username || !password) {
+        return res.status(404).json({message: "Error logging in"});
     }
-    authenticatedUser(user,pwd);
-    return res.status(200).send("User successfully logged in");
+
+    if (isValid(username) & authenticatedUser(username,password)) {
+        let accessToken = jwt.sign({
+            data: password
+         }, 'access', { expiresIn: 60 });
+
+        req.session.authorization = {
+            accessToken,username
+        }
+        return res.status(200).send("User successfully logged in");
+    } else {
+        return res.status(208).json({message: "Invalid Login. Check username and password"});
+    }
+
   //return res.status(300).json({message: "Yet to be implemented"});
 });
+
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
@@ -53,7 +76,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
             books[isbn].reviews = reviews;
         }
         //books[isbn].reviews = review;
-        res.send(`Book with the ${isbn} was updated.`);
+        res.send(`Book review with the ISBN ${isbn} was updated.`);
     }
     else {
         res.send(`ISBN ${isbn} not found.`);
