@@ -7,16 +7,27 @@ let users = [];
 
 const isValid = (username)=>{ //returns boolean
 //write code to check is the username is valid
+    return /^[0-9a-zA-Z_.-]+$/.test(username);
 }
 
 const authenticatedUser = (username,password)=>{ //returns boolean
 //write code to check if username and password match the one we have in records.
+    for (user of users) {
+        if (username === user.username && password === user.password) {
+            return True;
+        }
+        else {
+            return False
+        }
+    }
 }
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
     const user = req.body.username;
-    console.log(user);
+    const pwd = req.body.password;
+    isValid(user);
+
     if (!user) {
         return res.status(404).json({message: "Body Empty"});
     }
@@ -27,30 +38,27 @@ regd_users.post("/login", (req,res) => {
       req.session.authorization = {
         accessToken
     }
+    authenticatedUser(user,pwd);
     return res.status(200).send("User successfully logged in");
   //return res.status(300).json({message: "Yet to be implemented"});
 });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-    const reviews = req.params.reviews;
-    const isbn = req.params.isbn;
-  let filtered_users = users.filter((user) => user.email === email);
-  if (filtered_users.length > 0) {
-    let filtered_user = filtered_users[0];
-    let reviews = req.query.reviews;
-    
-    if(reviews) {
-        filtered_user.reviews = reviews;
+    //const review = req.query.reviews;
+    let isbn = req.params.isbn;
+    if(isbn) {
+        const reviews = req.query.reviews;
+        if (reviews) {
+            books[isbn].reviews = reviews;
+        }
+        //books[isbn].reviews = review;
+        res.send(`Book with the ${isbn} was updated.`);
     }
-    
-    users = users.filter((user) => user.email != email);
-    users.push(filtered_user);
-    res.send(`Book with the ${isbn} was updated.`);
-}
-else{
-    res.send("Unable to find user!");
-}
+    else {
+        res.send(`ISBN ${isbn} not found.`);
+    }
+
   //return res.status(300).json({message: "Yet to be implemented"});
 });
 
